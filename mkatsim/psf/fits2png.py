@@ -225,6 +225,7 @@ def write_png(
     levels = np.linspace(lowcut,highcut, num=150)
     # Colormap selection (todo- make the colormap a kwarg)
     cmapin = plt.get_cmap(cmap)
+    # XXX: UNUSED
     norm = BoundaryNorm(levels, ncolors=cmapin.N, clip=True)
     im=plt.figure(figsize=(6,5))
     ax=im.add_subplot(111)

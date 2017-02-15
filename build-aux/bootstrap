@@ -1,0 +1,19 @@
+#! /bin/sh -ex
+# Copyright (C) 2017 Deneys S. Maartens <deneys.maartens@gmail.com>
+
+# Bootstrap this package from checked-out sources for python.
+#
+# This script needs to be called from the top directory of the source tree,
+# where `requirements.txt` can be found, for example:
+#
+#     ./build-aux/bootstrap
+
+# default virtualenv path; may be overridden by environment variable
+ENV=${ENV:-./venv}
+
+python -m virtualenv --clear $ENV --system-site-packages
+
+$ENV/bin/python -m pip install --upgrade pip
+$ENV/bin/python -m pip install --requirement requirements.txt
+
+# -fin-

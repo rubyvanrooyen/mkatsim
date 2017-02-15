@@ -1,0 +1,23 @@
+#! /bin/sh -ex
+# Copyright (C) 2017 Deneys S. Maartens <deneys.maartens@gmail.com>
+
+# Use this script to make the source directory REALLY clean.
+#
+# This script needs to be called from the top directory of the source tree,
+# where the top-level `Makefile` can be found, for example:
+#
+#     ./build-aux/clobber
+
+# default virtualenv path; may be overridden by environment variable
+ENV=${ENV:-./venv}
+
+# clobber generated files
+test -f Makefile && make distclean
+
+# remove virtual environment
+test -d $ENV && rm -rf $ENV
+
+# clobber backup files
+find . -name '*~' -delete
+
+# -fin-

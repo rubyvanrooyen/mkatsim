@@ -1,0 +1,6 @@
+# development requirements
+flake8
+pytest-cov
+
+# run-time requirements
+-e .

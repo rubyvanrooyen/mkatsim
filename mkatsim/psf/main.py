@@ -24,6 +24,9 @@ import slicepsf
 
 
 def main(opts, args):
+    # TODO:
+    #   possibly be more explicit about what opts & args are accepted -- would
+    #   be helpful info for when one wants to call main() from somewhere else
     # Reference location
     lon = Longitude(opts.lon.strip(), u.degree, wrap_angle=180*u.degree, copy=False)
     lat = Latitude(opts.lat.strip(), u.degree, copy=False)
@@ -45,6 +48,7 @@ def main(opts, args):
 
 ## Make dummy measurement set for simulations
     nscans=int(12./opts.dtime) # number scans
+    ## XXX: UNUSED
     dintegration=opts.synthesis*3600/nscans # integration time per scan
     declinations_deg = opts.declination.strip().split(',')
     for opts.declination in declinations_deg:
@@ -78,7 +82,7 @@ def main(opts, args):
                 msname,
                 ])
         except subprocess.CalledProcessError as e:
-            # handle or report exception here, maybe
+            # TODO: handle or report exception here, maybe
             pass
 
 ## Convert wsclean generated fits files to PNG

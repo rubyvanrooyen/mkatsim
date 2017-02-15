@@ -1,5 +1,7 @@
 from optparse import OptionParser, OptionGroup
 
+from .main import main
+
 
 def cli():
     usage = '%prog [options] --cfg <makems.cfg> <ant_pos_file>'
@@ -112,6 +114,8 @@ def cli():
         print('Need makems config file')
         parser.print_usage()
         raise SystemExit
+
+    main(opts, args)
 
 
 if __name__ == '__main__':

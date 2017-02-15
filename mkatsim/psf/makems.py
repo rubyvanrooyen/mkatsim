@@ -46,7 +46,7 @@ def ms_make(opts):
     try:
         subprocess.check_call(['makems', file.name])
     except subprocess.CalledProcessError as e:
-        # handle or report exception here, maybe
+        # TODO: handle or report exception here, maybe
         pass
     finally:
         os.remove(file.name)
@@ -60,4 +60,4 @@ def ms_make(opts):
     return '%s_p0'%msname
 
 
-# -fin
+# -fin-
