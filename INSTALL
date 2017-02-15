@@ -1,0 +1,14 @@
+Development installation into a local python virtual environment
+================================================================
+./build-aux/bootstrap  
+-- Build virtual environment venv directory
+-- Install all dependencies
+-- Install package in development mode
+
+./build-aux/globber  
+-- Remove the development installation
+-- Destroy the python virtual environment
+-- Cleanup and reset
+
+Production installation
+=======================
