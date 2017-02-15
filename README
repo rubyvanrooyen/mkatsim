@@ -1,0 +1,4 @@
+aptitude install libcasacore2-dev
+pip install python-casacore
+
+

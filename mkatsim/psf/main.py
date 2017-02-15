@@ -17,11 +17,9 @@ from astropy.coordinates import Longitude, Latitude, EarthLocation
 
 import casacore.tables
 
-from fits2png import fits2png
 from makems import ms_make
 import coordinates
-import slicepsf
-
+import plot
 
 def main(opts, args):
     # TODO:
@@ -41,12 +39,13 @@ def main(opts, args):
 
 ## Create CASA ANTENNA table for antenna positions
     if opts.tblname is None:
-        opts.tblname = '%s_ANTENNAS'%opts.array
+        opts.tblname = '%s_ANTENNA'%opts.array
         import anttbl
         try: anttbl.make_tbl(opts.tblname, ant_list)
         except: raise
 
 ## Make dummy measurement set for simulations
+    msname=None
     nscans=int(12./opts.dtime) # number scans
     ## XXX: UNUSED
     dintegration=opts.synthesis*3600/nscans # integration time per scan
@@ -75,7 +74,8 @@ def main(opts, args):
                 '-j', '4',
                 '-size', '7200', '7200',
                 '-scale', '0.5asec',
-                '-weight', 'briggs', str(opts.briggs_weight),
+                '-weight', 'briggs', str(opts.robust),
+                # '-weight', ' '.join((opts.weight, str(opts.robust))),
                 '-make-psf',
                 '-fitbeam',
                 '-name', msname,
@@ -85,15 +85,20 @@ def main(opts, args):
             # TODO: handle or report exception here, maybe
             pass
 
+    sliceout=None
+    uvout=None
 ## Convert wsclean generated fits files to PNG
+    from fits2png import fits2png
     for fitsfile in glob.glob('*psf.fits'):
-        fits2png(fitsfile,area=0.04,contrast=0.05,cmap='jet')
-#KYK WAT HIER AANGAAN -- HOEKOM VERANDER DIT DIE FITS FILE
-# ## Slice through the major axis of the PSF
-#         outfile = '%s-slice.png'%os.path.splitext(os.path.basename(fitsfile))[0]
-#         slicepsf.along_axes(fitsfile, output=outfile) # need to look at this script -- something in here changes the FITS file
+        if opts.savegraph:
+            fits2png(fitsfile,area=0.04,contrast=0.05,cmap='jet')
 
-
+            sliceout = '%s-slice.png'%os.path.splitext(os.path.basename(fitsfile))[0]
+            uvout = '%s-uv.png'%os.path.splitext(os.path.basename(msname))[0]
+## Slice through the major axis of the PSF
+        plot.slicepsf(fitsfile, output=sliceout)
+## UV coverage of measurement set
+        plot.uv(msname, output=uvout)
 
     if opts.verbose:
         try: plt.show()

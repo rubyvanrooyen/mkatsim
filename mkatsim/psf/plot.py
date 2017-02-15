@@ -1,10 +1,30 @@
-import numpy as np
 from scipy import ndimage
 import matplotlib.pylab as plt
+import numpy as np
+import os
 import pyfits
+import shutil
+import tempfile
 
-def along_axes(imfile, verbose=False, output=None):
-
+# Use fake temp file to crop psf for slicing, do not change input fits image
+def slicepsf(
+             fitsimage,
+             output=None,
+            ):
+    """Wrap along_axes with temp file."""
+    with tempfile.NamedTemporaryFile(delete=False) as file:
+        pass
+    try:
+        shutil.copy(fitsimage, file.name)
+        along_axes(file.name, output=output)
+    except : raise
+    finally: os.remove(file.name)
+# Take sections through the beam major and minor axes
+def along_axes(
+               imfile, # fits input image
+               output=None,
+              ):
+    """Plot a slice through the major and minor axes of a beam."""
     #Chop the psf to desired size
     t=pyfits.open(imfile,mode='update')
     t[0].header['NAXIS1']=480
@@ -72,48 +92,41 @@ def along_axes(imfile, verbose=False, output=None):
     minor =  ndimage.map_coordinates(fitsfile[0].data[0,0], np.vstack((xmin_r,ymin_r)),order=1)
     pixels_asec=np.linspace(0.,line_length,num)-(line_length/2)
 
-    if verbose or output is not None:
-        fig = plt.figure(figsize=(10,7))
-        plt.title('Fitted Beam Maj:%4.1f asec. Min:%4.1f asec. PA %3.0f deg.'%(bmaj,bmin,bpa,),fontsize=14)
-        plt.plot(pixels_asec,major,color='black',label='Major Axis')
-        plt.plot(pixels_asec,minor,linestyle='dashed',color='black',label='Minor Axis')
-        plt.xlim([-60.,60.])
-        plt.xticks(np.arange(-60,60,20.0))
-        plt.axhline(0.0,linestyle='dotted',color='black')
-        plt.xlabel('Beam Width (arcseconds)',fontsize=16)
-        plt.ylabel('Beam Height',fontsize=16)
-        plt.legend(loc='upper left', numpoints=1,fontsize=16)
-        plt.yticks(fontsize=16)
-        plt.xticks(fontsize=16)
-        if output is not None: plt.savefig(output)
+    fig = plt.figure(figsize=(10,7))
+    plt.title('Fitted Beam Maj:%4.1f asec. Min:%4.1f asec. PA %3.0f deg.'%(bmaj,bmin,bpa,),fontsize=14)
+    plt.plot(pixels_asec,major,color='black',label='Major Axis')
+    plt.plot(pixels_asec,minor,linestyle='dashed',color='black',label='Minor Axis')
+    plt.xlim([-60.,60.])
+    plt.xticks(np.arange(-60,60,20.0))
+    plt.axhline(0.0,linestyle='dotted',color='black')
+    plt.xlabel('Beam Width (arcseconds)',fontsize=16)
+    plt.ylabel('Beam Height',fontsize=16)
+    plt.legend(loc='upper left', numpoints=1,fontsize=16)
+    plt.yticks(fontsize=16)
+    plt.xticks(fontsize=16)
+    if output is not None: plt.savefig(output)
 
-    return [major, minor, pixels_asec]
+def uv(
+       msname,
+       output=None,
+      ):
+    """Plot the uv coverage in a measurement set"""
 
-if __name__ == '__main__':
-    from optparse import OptionParser, OptionGroup
-    usage='%prog [options] <fitsimage>'
-    parser = OptionParser(usage=usage, description="Plot a slice through the major and minor axes of a beam.", version="%prog 1.0")
-    parser.add_option('-o', '--outfile',
-                      action='store',
-                      dest='outfile',
-                      type=str,
-                      default=None,
-                      help='Filename for output image')
-    parser.add_option('-v', "--verbose",
-                      dest='verbose',
-                      action="store_true",
-                      default=False,
-                      help="Display image")
-    (opts, args) = parser.parse_args()
-    if len(args) < 1:
-        print('No Fits image file given')
-        parser.print_usage()
-        raise SystemExit
+    import casacore.tables
 
-    [major, minor, pixels_asec] = along_axes(args[0], verbose=opts.verbose, output=opts.outfile)
+    tab=casacore.tables.table(msname)
+    uv=tab.getcol("UVW")[:,:2]
 
-    if opts.verbose:
-        try: plt.show()
-        except: pass # nothing to show
+    fig=plt.figure(figsize=(20,13))
+    ax = fig.add_subplot(111)
+    plt.title('uv coverage',fontsize=30)
+    plt.scatter(uv[:,0],uv[:,1],s=1,color='b')
+    plt.scatter(-uv[:,0],-uv[:,1],s=1,color='r')
+    plt.xlabel('u (meters)',fontsize=28)
+    plt.ylabel('v (meters)',fontsize=28)
+    plt.yticks(fontsize=28)
+    plt.xticks(fontsize=28)
+    if output is not None: plt.savefig(output)
+
 
 # -fin-
