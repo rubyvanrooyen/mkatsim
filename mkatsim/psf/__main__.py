@@ -1,12 +1,13 @@
 from optparse import OptionParser, OptionGroup
 
 from .main import main
+from .. import _version
 
 
 def cli():
     from optparse import OptionParser, OptionGroup
     usage='%prog [options] --cfg <makems.cfg> <ant_pos_file>'
-    parser = OptionParser(usage=usage, version="%prog 1.0")
+    parser = OptionParser(usage=usage, version="%prog " + _version.__version__)
     parser.add_option('--array',
                       action='store',
                       dest='array',
