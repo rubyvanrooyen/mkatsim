@@ -1,5 +1,4 @@
-#! /usr/bin/python
-## Utilty module for various antenna coordinates
+"""Utility module for various antenna coordinates"""
 
 from __future__ import print_function
 

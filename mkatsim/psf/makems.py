@@ -1,5 +1,4 @@
-#! /usr/bin/python
-# Container for makems wrapper and all parts of it
+"""Container for makems wrapper and all parts of it"""
 
 from __future__ import print_function
 

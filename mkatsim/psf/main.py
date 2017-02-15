@@ -1,5 +1,4 @@
-#! /usr/bin/python
-## Simulate PSF, Image and Dirty Image
+"""Simulate PSF, Image and Dirty Image"""
 
 from __future__ import print_function
 from datetime import datetime, timedelta

@@ -1,5 +1,4 @@
-#! /usr/bin/python
-## Create CASA ANTENNA table for antenna ENU positions
+"""Create CASA ANTENNA table for antenna ENU positions"""
 #  Similar to mkant.py for LOFAR
 import casacore.tables
 from casacore.tables import tablecreatescalarcoldesc as cldsc

@@ -1,5 +1,4 @@
-#! /usr/bin/python
-## Convert fits file to .png file with useful contrast scaling options.
+"""Convert fits file to .png file with useful contrast scaling options."""
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
