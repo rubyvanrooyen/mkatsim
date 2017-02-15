@@ -5,13 +5,13 @@ from datetime import datetime, timedelta
 
 import glob
 import matplotlib.pyplot as plt
-import numpy
+# import numpy
 import os
-import shutil
+# import shutil
 import subprocess
-import tempfile
+# import tempfile
 
-import astropy
+# import astropy
 from astropy import units as u
 from astropy.coordinates import Longitude, Latitude, EarthLocation
 
@@ -20,6 +20,7 @@ import casacore.tables
 from makems import ms_make
 import coordinates
 import plot
+
 
 def main(opts, args):
     # TODO:
@@ -39,16 +40,17 @@ def main(opts, args):
 
 ## Create CASA ANTENNA table for antenna positions
     if opts.tblname is None:
-        opts.tblname = '%s_ANTENNA'%opts.array
+        opts.tblname = '%s_ANTENNA' % opts.array
         import anttbl
-        try: anttbl.make_tbl(opts.tblname, ant_list)
-        except: raise
+        try:
+            anttbl.make_tbl(opts.tblname, ant_list)
+        except:
+            raise
 
 ## Make dummy measurement set for simulations
-    msname=None
-    nscans=int(12./opts.dtime) # number scans
-    ## XXX: UNUSED
-    dintegration=opts.synthesis*3600/nscans # integration time per scan
+    msname = None
+    nscans = int(12./opts.dtime)  # number scans
+    dintegration = opts.synthesis*3600/nscans  # integration time per scan # noqa
     declinations_deg = opts.declination.strip().split(',')
     for opts.declination in declinations_deg:
         if opts.stime is not None:
@@ -59,13 +61,14 @@ def main(opts, args):
         mslist = []
         for scan in range(nscans):
             starttime = starttime_object + timedelta(seconds=scan*opts.dtime*3600.)
-            opts.stime=starttime.strftime("%Y/%m/%d/%H:%M")
+            opts.stime = starttime.strftime("%Y/%m/%d/%H:%M")
             mslist.append(ms_make(opts))
 
         if len(mslist) > 1:
-            msname='%s_%sdeg_%.2fhr.ms_p0' % (opts.array, opts.declination, opts.synthesis)
-            casacore.tables.msconcat(mslist,msname,concatTime=True)
-        else: msname = mslist[0]
+            msname = '%s_%sdeg_%.2fhr.ms_p0' % (opts.array, opts.declination, opts.synthesis)
+            casacore.tables.msconcat(mslist, msname, concatTime=True)
+        else:
+            msname = mslist[0]
 
 ##Clean simulated data to get psf
         try:
@@ -81,27 +84,35 @@ def main(opts, args):
                 '-name', msname,
                 msname,
                 ])
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError as e:  # noqa
             # TODO: handle or report exception here, maybe
             pass
 
-    sliceout=None
-    uvout=None
+    sliceout = None
+    uvout = None
 ## Convert wsclean generated fits files to PNG
+    # PSF files to PNG
     from fits2png import fits2png
     for fitsfile in glob.glob('*psf.fits'):
-        if opts.savegraph:
-            fits2png(fitsfile,area=0.04,contrast=0.05,cmap='jet')
-
-            sliceout = '%s-slice.png'%os.path.splitext(os.path.basename(fitsfile))[0]
-            uvout = '%s-uv.png'%os.path.splitext(os.path.basename(msname))[0]
+        fits2png(fitsfile, area=0.04, contrast=0.05, cmap='jet')
 ## Slice through the major axis of the PSF
+        sliceout = '%s-slice.png' % os.path.splitext(os.path.basename(fitsfile))[0]
         plot.slicepsf(fitsfile, output=sliceout)
 ## UV coverage of measurement set
+        uvout = '%s-uv.png' % os.path.splitext(os.path.basename(msname))[0]
         plot.uv(msname, output=uvout)
+    # All fits files to PNG
+    if opts.verbose or opts.savegraph:
+        for fitsfile in glob.glob('*.fits'):
+            try:
+                fits2png(fitsfile, area=0.04, contrast=0.05, cmap='jet')
+            except:
+                pass  # do not care
 
     if opts.verbose:
-        try: plt.show()
-        except: pass # nothing to show
+        try:
+            plt.show()
+        except:
+            pass  # nothing to show
 
 # -fin-

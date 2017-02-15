@@ -1,4 +1,7 @@
-aptitude install libcasacore2-dev
-pip install python-casacore
+Simulation tools for MeerKAT telescope  
+======================================  
+
+Simulating the beam shape of an antenna array  
+mkspsf --cfg ../config/makems.cfg --enu ../config/mkat_antennas.enu  
 
 
