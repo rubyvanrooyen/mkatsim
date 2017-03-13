@@ -33,6 +33,7 @@ setup(
     entry_points={
         'console_scripts': [
             'mkspsf=mkatsim.psf.__main__:cli',
+            'mksarray=mkatsim.subarray.__main__:cli',
             ],
         },
 )
