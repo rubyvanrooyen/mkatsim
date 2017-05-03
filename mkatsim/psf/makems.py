@@ -7,42 +7,67 @@ import shutil
 import subprocess
 import tempfile
 
+
 #Read makems config file into dictionary
 def cfg_read(
-            cfgfile, # some default config file
-           ):
+            cfgfile,  # some default config file
+            ):
     fin = open(cfgfile, 'r')
     config = fin.readlines()
     fin.close()
-    cfg_dict={}
+    cfg_dict = {}
     for line in config:
         [key, value] = line.strip().split('=')
-        if cfg_dict.has_key(key): raise RuntimeError('Duplicate key %s' % key)
-        cfg_dict[key]=value
+        if key in cfg_dict:
+            raise RuntimeError('Duplicate key %s' % key)
+        cfg_dict[key] = value
     return cfg_dict
+
+
 #Fake file for makems input
-def cfg_write_ms(cfg_file, cfg_dict):
+def cfg_write_ms(cfg_file, cfg_dict, verbose=False):
     for key, value in cfg_dict.iteritems():
         # cfg_file.write('%s\n'%('='.join((key, str(value)))))
         print('='.join((key, str(value))), file=cfg_file)
-        print('='.join((key, str(value))))  # debug
+        if verbose:
+            print('='.join((key, str(value))))
+
+
 #Make empty measurement set
 def ms_make(opts):
     cfg_dict = cfg_read(opts.cfg)
-    ntimesteps = (opts.synthesis*3600./opts.dt) / (12./opts.dtime)
-    msname = '%s_%sdeg_%s.ms' % (opts.array, opts.declination, opts.stime.replace('/','-'))
+    ntimesteps = (opts.synthesis/opts.dt) / (12./opts.dtime)
+    if opts.msname is None:
+        msname = '%s_%s_%s.ms' % (opts.array, opts.declination, opts.stime.replace('/', '-'))
+    else:
+        msname = '%s_%s_%s.ms' % (opts.array, opts.declination, opts.stime.replace('/', '-'))
+    if opts.tblname is None:
+        opts.tblname = 'ANTENNAS'
     # generate makems config file
     cfg_dict.update({
+       'NParts': opts.nparts,
+       'NBands': opts.nbands,
+       'NFrequencies': opts.nfreqs,
+       'StartFreq': opts.sfreq,
+       'StepFreq': opts.stepfreq,
+       'StartTime': opts.stime,
+       'StepTime': opts.dt,
+       'NTimes': int(ntimesteps) + 1,
+       'RightAscension': opts.rightascension,
+       'Declination': '%s' % opts.declination,
        'AntennaTableName': opts.tblname,
        'MSName': msname,
-       'Declination': '%sdeg' % opts.declination,
-       'NTimes': int(ntimesteps) + 1,
-       'StartTime':opts.stime,
        })
+    if opts.debug:
+        print(cfg_dict)
+
+    # import sys
+    # sys.exit(0)
+
     # generate a measurement set
     # http://stackoverflow.com/a/15343686
     with tempfile.NamedTemporaryFile(delete=False) as file:
-        cfg_write_ms(file, cfg_dict)
+        cfg_write_ms(file, cfg_dict, verbose=opts.debug)
     try:
         subprocess.check_call(['makems', file.name])
     except subprocess.CalledProcessError as e:
@@ -57,7 +82,7 @@ def ms_make(opts):
     shutil.rmtree(antenna_bak, ignore_errors=True)  # /should/ be safe enough
     shutil.move(antenna_dir, antenna_bak)
     shutil.copytree(opts.tblname, antenna_dir)
-    return '%s_p0'%msname
+    return '%s_p0' % msname
 
 
 # -fin-

@@ -18,12 +18,12 @@ def cli():
                      type=str,
                      default=None,
                      help='Name of subarray as defined in config')
-    group.add_option('--ant',
+    group.add_option('--ant_list',
                      action='store',
-                     dest='antenna_list',
+                     dest='ant_list',
                      type=str,
                      default=None,
-                     help='Comman separated list of antenna names')
+                     help='Comma separated list of antenna names')
     parser.add_option_group(group)
 
     # layout

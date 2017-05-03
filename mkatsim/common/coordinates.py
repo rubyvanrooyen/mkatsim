@@ -5,12 +5,15 @@ from __future__ import print_function
 from astropy import units as u
 from astropy.coordinates import Longitude, Latitude, EarthLocation
 
+import string
+
 
 #Read antenna position file
 def read(
-        ant_pos_file,  # Antenna coord file
-        ref_location,  # Array location: (LAT,LON,ALT)
-        enu=False,     # Coord file has ENU coords
+        ant_pos_file,   # Antenna coord file
+        ref_location,   # Array location: (LAT,LON,ALT)
+        antennas=None,  # CS list of selected antennas
+        enu=False,      # Coord file has ENU coords
         ):
     [x, y, z] = ref_location.to_geocentric()
 
@@ -48,7 +51,17 @@ def read(
         ant_parms['DISH_DIAMETER'] = float(diameter)
         ant_list.append(ant_parms)
 
-    return [array, ant_list]
+    if antennas is None:
+        return [array, ant_list]
+
+    antennas = [string.lower(ant.strip()) for ant in antennas.split(',')]
+    subarray = {}
+    subant_list = []
+    for ant in ant_list:
+        if string.lower(ant['NAME']) in antennas:
+            subarray[ant['NAME']] = array[ant['NAME']]
+            subant_list.append(ant)
+    return [subarray, subant_list]
 
 
 # Telescope reference position

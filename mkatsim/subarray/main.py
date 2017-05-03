@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 from ..common import coordinates
 
+
 def main(opts, args):
     # Reference location
     ref_location = coordinates.location(opts.lat, opts.lon, opts.alt)
@@ -32,8 +33,8 @@ def main(opts, args):
             subarray_geocentric = mkat.get_sub(opts.subarray)
             show_subarray(ref_location, array_geocentric, subarray_geocentric, subname=opts.subarray, savegraph=opts.savegraph)  # noqa
 
-    if opts.antenna_list is not None:
-        subarray_geocentric = mkat.def_sub(opts.antenna_list.split(','))
+    if opts.ant_list is not None:
+        subarray_geocentric = mkat.def_sub(opts.ant_list.split(','))
         show_subarray(ref_location, array_geocentric, subarray_geocentric, subname='custom', radii=False, savegraph=opts.savegraph)  # noqa
 
         if opts.savesubarray:
