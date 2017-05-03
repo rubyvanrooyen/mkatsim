@@ -1,6 +1,6 @@
 Simulation tools for MeerKAT telescope
 ======================================
-https://github.com/ska-sa/mkatsim.wiki.git
+git clone https://github.com/ska-sa/mkatsim.wiki.git
 
 Display subarray layout for MeerKAT antennas   
 Simulating the beam shape of an antenna array
