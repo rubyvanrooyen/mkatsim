@@ -94,7 +94,12 @@ def main(parser, opts, args):
                 cmd_array.extend(['-%s' % ((arg.dest.replace('_', '-')))])
                 continue
             cmd_array.extend(['-%s' % ((arg.dest.replace('_', '-'))), str(arg_val)])  # noqa
+        if opts.debug:
+            cmd_array.extend(['-v'])
+
         cmd_array.append(msname)
+        if opts.debug:
+            print(' '.join(cmd_array))
 
         try:
             subprocess.check_call(cmd_array)
